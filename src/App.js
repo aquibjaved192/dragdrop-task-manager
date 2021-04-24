@@ -23,6 +23,29 @@ function App() {
   localStorage.setItem('columns', JSON.stringify(newColumnsArray));
  };
 
+ const deleteColumn = (id) => {
+  const currentColumns = [...columns];
+  const index = currentColumns.findIndex((item) => item.id === id);
+  currentColumns.splice(index, 1);
+  setColumns(currentColumns);
+  localStorage.setItem('columns', JSON.stringify(currentColumns));
+ };
+
+ const onDragDrop = (data) => {
+  const currentColumns = [...columns];
+  currentColumns[data.source.columnIndex]['tasks'].splice(
+   data.source.taskIndex,
+   1
+  );
+  currentColumns[data.target.columnIndex]['tasks'].splice(
+   data.target.taskIndex,
+   0,
+   data.source.data
+  );
+  setColumns(currentColumns);
+  localStorage.setItem('columns', JSON.stringify(currentColumns));
+ };
+
  return (
   <div className="App">
    {modalOpen && (
@@ -41,13 +64,16 @@ function App() {
     </button>
    </div>
    <div className="columns-container">
-    {columns.map((item) => {
+    {columns.map((item, index) => {
      return (
       <Column
        key={item.id}
        data={item}
        columns={columns}
        setColumns={setColumns}
+       deleteColumn={deleteColumn}
+       onDragDrop={onDragDrop}
+       colIndex={index}
       />
      );
     })}
